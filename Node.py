@@ -4,7 +4,7 @@ class Node:
     def __init__(self):
         
         # Global variables
-        data = None
+        data = None # <- Data can be any type
         prev_hash = None
         next_hash = None
 
