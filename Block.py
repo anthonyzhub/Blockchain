@@ -8,6 +8,7 @@ class Block:
         self.prev_hash = None
         self.next_hash = None
 
+    """
     # Setter methods
     def set_data(self, incoming_data):
         self.current_hash = incoming_data
@@ -27,3 +28,4 @@ class Block:
 
     def get_data(self):
         return self.current_hash
+    """
