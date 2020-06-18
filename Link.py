@@ -1,4 +1,5 @@
 from Block import Block
+from Hash import Hash
 
 class LinkList:
 
@@ -22,13 +23,20 @@ class LinkList:
         # OBJECTIVE: Check if list is empty
         return self.get_size() == 0
 
-    def add_block(self, incoming_hash):
+    def add_block(self, incoming_data):
         # OBJECTIVE: Append a block at the end of the chain
+
+        # Immediately encrypt incoming_hash
+        hash_class = Hash()
+        
+        # Decide on how to encrypt incoming_data (whether it's a list or not)
+        if hash_class.isDataList(incoming_data):
+            incoming_hash = hash_class.encrypt_list(incoming_data)
+        else:
+            incoming_hash = hash_class.encrypt_data(incoming_data)
 
         # If list is empty, automatically add incoming_hash as head block
         if self.is_empty():
-
-            print("List is empty")
 
             # Create a new block
             new_head_block = Block()

@@ -36,7 +36,7 @@ class Hash:
     def encrypt_data(self, incoming_data):
         # OBJECTIVE: Encrypt incoming data and return its hash value
 
-        # If unencrypted_data is a String, then it needs to be encoded to be able to convert to bytes
+        # If incoming_data is a String, then it needs to be encoded to be able to convert to bytes
         if self.isDataString(incoming_data):
             
             try:
@@ -44,18 +44,11 @@ class Hash:
                 b_data = self.encode_string(incoming_data)
 
             except TypeError as err:
-                
                 # Print error message
                 self.errorMessage(err)
 
-        elif self.isDataList(incoming_data):
-
-            # Print error message, if unencrypted_data is actually a list, instead of a single variable
-            self.errorMessage("Error: 'incoming_data' is not a singular variable, but a list")
-
         else:
-            
-            # Convert unencrypted_data to bytes
+            # Convert incoming_data to bytes
             b_data = bytes(incoming_data)
 
         # Encrypt data with blake2b()
@@ -72,28 +65,18 @@ class Hash:
         # Create instance of blake2b() for further use
         blake_encrypt = blake2b()
 
-        # Ensure parameter is a list
-        if self.isDataList(incoming_list):
+        # Specify encoding if it's a string list
+        if self.isDataString(incoming_list[0]):
             
-            # Specify encoding if it's a string list
-            if self.isDataString(incoming_list[0]):
-                
-                for i in incoming_list:
+            for i in incoming_list:
+                # Encode string, then encrypt it
+                blake_encrypt.update(self.encode_string(i))
 
-                    # Encode string, then encrypt it
-                    blake_encrypt.update(self.encode_string(i))
-
-            else:
-
-                for i in incoming_list:
-
-                    # Change all elements inside array to bytes
-                    blake_encrypt.update(bytes(i))
-        
         else:
             
-            # Raise exception if incoming_list is not a list
-            self.errorMessage("Error: 'incoming_list' is not a list, but a single variable")
+            for i in incoming_list:
+                # Change all elements inside array to bytes
+                blake_encrypt.update(bytes(i))
 
         # Return hexadecimal digest
         return blake_encrypt.hexdigest()
