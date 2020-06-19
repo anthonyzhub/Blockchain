@@ -30,7 +30,7 @@ class LinkList:
         hash_class = Hash()
         
         # Decide on how to encrypt incoming_data (whether it's a list or not)
-        if hash_class.isDataList(incoming_hash):
+        if hash_class.is_data_list(incoming_hash):
             incoming_hash = hash_class.encrypt_list(incoming_hash)
         else:
             incoming_hash = hash_class.encrypt_data(incoming_hash)

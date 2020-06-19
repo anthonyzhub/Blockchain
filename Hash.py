@@ -7,7 +7,7 @@ class Hash:
     def __init__(self):
         pass
 
-    def isDataString(self, data):
+    def is_data_string(self, data):
         # OBJECTIVE: Check if data is type string
 
         if isinstance(data, str):
@@ -15,7 +15,7 @@ class Hash:
         
         return False
 
-    def isDataList(self, data):
+    def is_data_list(self, data):
         # OBJECTIVE: Check if data is type array
  
         if isinstance(data, list):
@@ -23,7 +23,7 @@ class Hash:
 
         return False
 
-    def errorMessage(self, message):
+    def error_message(self, message):
         # OBJECTIVE: To print an error message
 
         raise Exception(message)
@@ -37,7 +37,7 @@ class Hash:
         # OBJECTIVE: Encrypt incoming data and return its hash value
 
         # If incoming_data is a String, then it needs to be encoded to be able to convert to bytes
-        if self.isDataString(incoming_data):
+        if self.is_data_string(incoming_data):
             
             try:
                 # Attempt to encode string in UTF-8
@@ -45,7 +45,7 @@ class Hash:
 
             except TypeError as err:
                 # Print error message
-                self.errorMessage(err)
+                self.error_message(err)
 
         else:
             # Convert incoming_data to bytes
@@ -66,7 +66,7 @@ class Hash:
         blake_encrypt = blake2b()
 
         # Specify encoding if it's a string list
-        if self.isDataString(incoming_list[0]):
+        if self.is_data_string(incoming_list[0]):
             
             for i in incoming_list:
                 # Encode string, then encrypt it
