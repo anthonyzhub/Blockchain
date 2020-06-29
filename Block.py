@@ -8,6 +8,6 @@ class Block:
         self.next_block_pointer = None
 
         # Hold values of surrounding blocks' hash value
+        self.previous_block_hash = None
         self.current_block_hash = None
-        self.prev_block_hash = None
-        self.next_block_hash = None
+        self.current_block_data = None

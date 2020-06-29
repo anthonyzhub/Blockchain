@@ -3,10 +3,17 @@ from Hash import Hash
 
 class LinkList:
 
+    # Declare static variable for add_block()
+    # A static variable's value will always be remembered until program is terminated
+    previous_hash_static = None
+
     def __init__(self):
         
         # Set head node as blank
         self.genesis_block = None
+
+        # Initialize Hash class
+        self.hash_class = Hash()
 
         # Set starting size to 0
         self.list_size = 0
@@ -23,17 +30,14 @@ class LinkList:
         # OBJECTIVE: Check if list is empty
         return self.get_size() == 0
 
-    def add_block(self, incoming_hash):
+    def add_block(self, new_unencrypted_data):
         # OBJECTIVE: Append a block at the end of the chain
 
         # Create instance of Hash class
-        hash_class = Hash()
-        
-        # Decide on how to encrypt incoming_data (whether it's a list or not)
-        if hash_class.is_data_list(incoming_hash):
-            incoming_hash = hash_class.encrypt_list(incoming_hash)
-        else:
-            incoming_hash = hash_class.encrypt_data(incoming_hash)
+        self.hash_class = Hash()
+
+        # Encrypt data
+        new_encrypted_data = self.hash_class.encrypt_data(new_unencrypted_data)
 
         # If list is empty, automatically add incoming_hash as head block
         if self.is_empty():
@@ -43,12 +47,12 @@ class LinkList:
 
             # Create links for block
             new_head_block.prev_block_pointer = None
-            new_head_block.prev_block_hash = None # <- Genesis block doesn't have a previous hash because it's the first
-            
-            new_head_block.current_block_hash = incoming_hash
-            
             new_head_block.next_block_pointer = None
-            new_head_block.next_block_hash = None # <- Set to None until a new block is created
+            
+            # Add encrypted and unencrypted data to block
+            new_head_block.previous_block_hash = None
+            new_head_block.current_block_hash = new_encrypted_data
+            new_head_block.current_block_data = new_unencrypted_data # Add unencrypted data for verification later on
 
             # Set new_head_block as genesis_block
             self.genesis_block = new_head_block
@@ -57,7 +61,8 @@ class LinkList:
 
             # Create a new node and pass incoming_hash to it
             new_block = Block()
-            new_block.current_block_hash = incoming_hash
+            new_block.current_block_hash = new_encrypted_data
+            new_block.current_block_data = new_unencrypted_data
 
             # Go to last block inside of chain
             current_block = self.genesis_block
@@ -67,106 +72,65 @@ class LinkList:
 
             # Update current_block's pointer and hash value
             current_block.next_block_pointer = new_block
-            current_block.next_block_hash = new_block.current_block_hash
 
             # Update new_block's pointers and hash values
+            new_block.previous_block_hash = self.previous_hash_static
             new_block.prev_block_pointer = current_block
-            new_block.prev_block_hash = current_block.current_block_hash
-
             new_block.next_block_pointer = None
-            new_block.next_block_hash = None
 
         # Update list's length
         self.list_size += 1
 
+        # Save new encrypted data to previous_hash_static
+        self.previous_hash_static = new_encrypted_data
+
     def verify_chain(self):
 
-        # OBJECTIVE: To verify chain hasn't been broken
-        # NOTE: A chain is broken if a block A has different hash records of block B.
+        # Check if list is empty or only has 1 block inside the chain
+        if self.is_empty() or self.list_size == 1:
+            print("Blockchain is empty or only has 1 block.")
+            return None
 
-        # Set previous, current, and next block for iteration
-        old_block = None
+        # Get 1st 2 block
         current_block = self.genesis_block
         next_block = current_block.next_block_pointer
 
-        # genesis_block shouldn't have any previous hashes, but still have a record of the next block's hash
-        if current_block.prev_block_hash == None and current_block.next_block_hash == current_block.next_block_pointer.current_block_hash:
+        while next_block is not None:
             
-            # Update blocks position
-            old_block = current_block
-            current_block = current_block.next_block_pointer
-            next_block = current_block.next_block_pointer
-
-        else:
-
-            # Print data inside genesis_block
-            print("Inside Genesis Block:")
-            print("\tPrevious Hash: {}".format(current_block.prev_block_hash))
-            print("\tNext Hash: {}\n".format(current_block.next_block_hash))
-
-            # Print suppose data
-            print("Suppose Data:")
-            print("\tPrevious Hash: {}".format(old_block)) # genesis_block doesn't have prev_block_hash because it's the 1st
-            print("\tNext Hash: {}".format(next_block.current_block_hash))
-
-            return False
-
-        # Iterate chain until the last block
-        while current_block.next_block_pointer is not None:
-
-            # Condition:
-            #   1. Current block's previous hash record must match previous block's hash
-            #   2. Current block's next hash record must mast next block's hash
-            if current_block.prev_block_hash == old_block.current_block_hash and current_block.next_block_hash == next_block.current_block_hash:
-                
-                # Update blocks position
-                old_block = current_block
-                current_block = current_block.next_block_pointer
-                next_block = current_block.next_block_pointer
-            
-            else:
-
-                # Print data inside genesis_block
-                print("Inside {} Block:".format(current_block.current_block_hash))
-                print("\tPrevious Hash: {}".format(current_block.prev_block_hash))
-                print("\tNext Hash: {}\n".format(current_block.next_block_hash))
-
-                # Print suppose data
-                print("Suppose Data:")
-                print("\tPrevious Hash: {}".format(old_block.current_block_hash))
-                print("\tNext Hash: {}".format(next_block.current_block_hash))
-
+            # Return "False" if hashes doesn't match
+            if current_block.current_block_hash != next_block.previous_block_hash:
+                print("Invalid chain!")
                 return False
 
-        # Return True, if exceptions haven't been raised
+            # Move to next block
+            current_block = next_block
+            next_block = next_block.next_block_pointer
+
+        # Return "True" if previous if-statement wasn't triggered
         return True
 
-    def print_list(self):        
-        # OBJECTIVE: Print all blocks inside of chain
+    def print_list(self):
 
-        # If chain is empty, return error message
         if self.is_empty():
-            print("List is empty")
+            print("List is empty!")
             return None
 
-        # Start from head node with starting position of 0
+        # Get starting block
         current_block = self.genesis_block
         position = 0
 
-        # Condition is True, if current_block has hash
         while current_block is not None:
 
             # Update position
             position += 1
 
-            # Print block's hash
+            # Print block's contents
             print("\nBlock Data:")
-            print("\tCurrent Block Hash Value: {}".format(current_block.current_block_hash))
-            print("\tPrevious Block Hash Value: {}".format(current_block.prev_block_hash))
-            print("\tNext Block Hash Value: {}".format(current_block.next_block_hash))
+            print("\tHash Value: {}".format(current_block.current_block_hash))
+            print("\tData: {}".format(current_block.current_block_data))
 
-            # Move to next node
+            # Move to next block
             current_block = current_block.next_block_pointer
 
         # Print total number of blocks inside chain
-        print("Total Blocks: {}".format(position))
+        print("\nTotal Blocks: {}".format(position))
