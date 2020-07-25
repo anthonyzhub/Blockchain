@@ -35,27 +35,11 @@ class Hash:
 
     def error_message(self, message):
         # OBJECTIVE: To print an error message
-
         raise Exception(message)
 
     def encode_string(self, incoming_str):
         # OBJECTIVE: To encode a string
-
         return bytes(incoming_str, 'UTF-8')
-
-    def encode_prev_block_hashes(self, prev_block_hashes):
-        # OBJECTIVE: To encrypt string of prev_block_hashes before being encrypted again with new data
-
-        if self.is_prev_block_hashes_none(prev_block_hashes):
-
-            # This condition should be executed only for genesis_block
-            # so, return False to skip encryption of prev_block_hashes
-            return False
-
-        else:
-
-            # Return prev_block_hashes as bytes
-            return self.encode_string(prev_block_hashes)
 
     def encrypt_individual_data(self, incoming_data):
         # OBJECTIVE: Encrypt incoming data and return its hash value
@@ -107,7 +91,17 @@ class Hash:
 
         # Encrypt lists, tuples, or dicts
         if isinstance(incoming_data, list) or isinstance(incoming_data, tuple) or isinstance(incoming_data, dict):
+            
             return self.encrypt_pair_data(incoming_data)
 
         else:
+
+            # Check if incoming_data is numeric
+            if isinstance(incoming_data, int) or isinstance(incoming_data, float):
+
+                # Temporarly convert numeric type to string
+                # This will make it easier to encrypt
+                incoming_data = str(incoming_data)
+
+            # Encrypt singleton data
             return self.encrypt_individual_data(incoming_data)

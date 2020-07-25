@@ -86,8 +86,11 @@ class LinkList:
 
     def verify_chain(self):
 
+        # OBJECTIVE: Verify block chain was not tampered with by comparing hashes between 2 blocks
+
         # Check if list is empty or only has 1 block inside the chain
         if self.is_empty() or self.list_size == 1:
+            
             print("Blockchain is empty or only has 1 block.")
             return None
 
@@ -97,8 +100,9 @@ class LinkList:
 
         while next_block is not None:
             
-            # Return "False" if hashes doesn't match
+            # Return "False" if hashes between current_block and next_block don't match
             if current_block.current_block_hash != next_block.previous_block_hash:
+                
                 print("Invalid chain!")
                 return False
 
@@ -111,7 +115,10 @@ class LinkList:
 
     def print_list(self):
 
+        # OBJECTIVE: Print block chain
+
         if self.is_empty():
+            
             print("List is empty!")
             return None
 

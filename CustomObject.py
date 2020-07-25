@@ -13,6 +13,7 @@ class CustomObject:
 
         # Check if parameter is string
         if not isinstance(new_string, str):
+            
             print("{} is {}".format(new_string, type(new_string)))
             return None
 
@@ -25,6 +26,7 @@ class CustomObject:
 
         # Check if parameter is int
         if not isinstance(new_int, int):
+            
             print("{} is {}".format(new_int, type(new_int)))
             return None
 
@@ -32,10 +34,11 @@ class CustomObject:
         return struct.pack('i', new_int)
 
     def float_to_struct(self, new_float):
-        # OBJECTIVE: Convert int to bytes
+        # OBJECTIVE: Convert float to bytes
 
         # Check if parameter is int
         if not isinstance(new_float, float):
+            
             print("{} is {}".format(new_float, type(new_float)))
             return None
 
