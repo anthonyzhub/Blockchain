@@ -3,6 +3,7 @@ import os
 import subprocess
 
 class CustomObject:
+    
     # OBJECTIVE: Created an empty class that represents a struct object similar in C++
     
     def __init__(self):

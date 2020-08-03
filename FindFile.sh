@@ -1,5 +1,7 @@
 #! /usr/bin/bash
 
+# OBJECTIVE: Import a file to the blockchain
+
 # Ask for directory of file's location
 read -p "Enter file's directory: " dir
 

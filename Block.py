@@ -1,5 +1,7 @@
 class Block:
 
+    # OBJECTIVE: To create components needed to make a block
+
     # Class initializer
     def __init__(self):
         
