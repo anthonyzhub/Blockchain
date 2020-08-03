@@ -1,6 +1,11 @@
 from Block import Block
 from Hash import Hash
 
+import numpy as np
+import pandas as pd
+import zipfile
+import os
+
 class LinkList:
 
     # Declare static variable for add_block()
@@ -17,6 +22,9 @@ class LinkList:
 
         # Set starting size to 0
         self.list_size = 0
+
+        # Set a data frame
+        self.data_frame = pd.DataFrame()
 
     def get_genesis_block(self):
         # OBJECTIVE: Get head node
@@ -141,3 +149,54 @@ class LinkList:
 
         # Print total number of blocks inside chain
         print("\nTotal Blocks: {}".format(position))
+
+    def download_blockchain_data(self):
+
+        # OBJECTIVE: Write blockchain data to CSV file
+
+        # Check if list is empty
+        if self.is_empty() is True:
+            return None
+
+        # Get genesis block
+        current_block = self.genesis_block
+        block_data = dict()
+        block_num = 0
+
+        while current_block is not None:
+
+            # Write block's data to dictionary
+            # block_data["Previous Block Pointer"] = current_block.prev_block_pointer <- Pointers point to memory address. It will be different in each computer
+            # block_data["Next Block Pointer"] = current_block.next_block_pointer
+            
+            block_data["Previous Block's Hash"] = current_block.previous_block_hash
+            block_data["Current Block's Hash"] = current_block.current_block_hash
+
+            block_data["Current Block's Data"] = current_block.current_block_data
+
+            # Save dictionary to data frame
+            self.data_frame = self.data_frame.append(block_data, ignore_index=True)
+
+            # Rename index names to Block <block_num>
+            """
+            1. Rename index with lambda function (nameless function)
+            2. Parameter for lambda function is block_num, the variable I created as a counter
+            3. The function will return a string "Block #" with # as the value of block_num
+            """
+            self.data_frame = self.data_frame.rename(index=lambda block_num: "Block {}".format(block_num))
+            block_num+=1
+
+            # Move to next block
+            current_block = current_block.next_block_pointer
+
+        # Write dataframe to CSV file
+        csv_file_name = "Zamora-Blockchain_Data.csv"
+        self.data_frame.to_csv(csv_file_name)
+
+        # Compress CSV file
+        zip_file = zipfile.ZipFile("Zamora-Blockchain.zip", mode='w') # <- Create a zip file archive for writing
+        zip_file.write(csv_file_name, compress_type=zipfile.ZIP_STORED) # <- Write csv file to zip_file for compression
+        zip_file.close() # <- Close file after writing to it
+
+        # Delete uncompressed file
+        os.remove(csv_file_name)
