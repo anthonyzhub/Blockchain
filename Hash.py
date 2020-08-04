@@ -1,4 +1,5 @@
 from hashlib import blake2b # <- Slightly faster than SHA-3 and just as secure
+from CustomObject import CustomObject
 
 class Hash:
 
@@ -8,6 +9,9 @@ class Hash:
         
         # Initialize blake2b()
         self.blake_encrypt = blake2b()
+
+        # Initialize CustomObject() class
+        self.custom_object = CustomObject()
 
     def is_data_string(self, data):
         # OBJECTIVE: Check if data is type string
@@ -94,14 +98,17 @@ class Hash:
             
             return self.encrypt_pair_data(incoming_data)
 
-        else:
+        # Encrypt incoming_data if it's numeric
+        elif isinstance(incoming_data, int) or isinstance(incoming_data, float):
 
-            # Check if incoming_data is numeric
-            if isinstance(incoming_data, int) or isinstance(incoming_data, float):
+            # Encrypt data as a string
+            return self.encrypt_individual_data(str(incoming_data))
 
-                # Temporarly convert numeric type to string
-                # This will make it easier to encrypt
-                incoming_data = str(incoming_data)
+        # If incoming_data is "import", import file
+        elif incoming_data == "import":
 
-            # Encrypt singleton data
-            return self.encrypt_individual_data(incoming_data)
+            # Get binary data of imported file as a string
+            imported_file = self.custom_object.import_text_file()
+
+            # Return encryption of the string
+            return self.encrypt_individual_data(imported_file)
