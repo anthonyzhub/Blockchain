@@ -16,10 +16,8 @@ class Signature:
         self.public_key = None
         self.signature = None
         self.user_name = os.environ['USER'] # <- Cannot find 'WHOAMI'
-        # hashes.SHA256() = hashes.SHA256()
         self.PRIVATE_FILE_NAME = "{}-Private_Key.pem".format(self.user_name)
         self.PUBLIC_FILE_NAME = "{}-Public_Key.pem".format(self.user_name)
-        # "UTF-8" = "UTF-8"
 
     def format_data(self, data):
 
