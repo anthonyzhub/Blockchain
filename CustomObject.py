@@ -13,6 +13,7 @@ class CustomObject:
         self.file_path = os.environ['PWD']
 
     def string_to_struct(self, new_string):
+        
         # OBJECTIVE: Convert string to bytes
 
         # Check if parameter is string
@@ -26,6 +27,7 @@ class CustomObject:
         return struct.pack('{}s'.format(len(new_string)), bytes(new_string, 'UTF-8'))
 
     def int_to_struct(self, new_int):
+        
         # OBJECTIVE: Convert int to bytes
 
         # Check if parameter is int
@@ -38,6 +40,7 @@ class CustomObject:
         return struct.pack('i', new_int)
 
     def float_to_struct(self, new_float):
+        
         # OBJECTIVE: Convert float to bytes
 
         # Check if parameter is int
@@ -50,6 +53,7 @@ class CustomObject:
         return struct.pack('f', new_float)
 
     def import_text_file(self):
+        
         # OBJECTIVE: Locate text file before importing to Python program
         
         # Ask for directory

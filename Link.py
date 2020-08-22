@@ -45,59 +45,6 @@ class LinkList:
 
         return self.get_size() == 0
 
-    """
-    def add_block(self, new_unencrypted_data):
-        # OBJECTIVE: Append a block at the end of the chain
-
-        # Encrypt data
-        new_encrypted_data = self.hash_class.encrypt_data(new_unencrypted_data)
-
-        # If list is empty, automatically add incoming_hash as head block
-        if self.is_empty():
-
-            # Create a new block
-            new_head_block = Block()
-
-            # Create links for block
-            new_head_block.prev_block_pointer = None
-            new_head_block.next_block_pointer = None
-            
-            # Add encrypted and unencrypted data to block
-            new_head_block.previous_block_hash = None
-            new_head_block.current_block_hash = new_encrypted_data
-            new_head_block.current_block_data = new_unencrypted_data # Add unencrypted data for verification later on
-
-            # Set new_head_block as genesis_block
-            self.genesis_block = new_head_block
-
-        else:
-
-            # Create a new node and pass incoming_hash to it
-            new_block = Block()
-            new_block.current_block_hash = new_encrypted_data
-            new_block.current_block_data = new_unencrypted_data
-
-            # Go to last block inside of chain
-            current_block = self.genesis_block
-
-            while current_block.next_block_pointer is not None:
-                current_block = current_block.next_block_pointer
-
-            # Update current_block's pointer and hash value
-            current_block.next_block_pointer = new_block
-
-            # Update new_block's pointers and hash values
-            new_block.previous_block_hash = self.previous_hash_static
-            new_block.prev_block_pointer = current_block
-            new_block.next_block_pointer = None
-
-        # Update list's length
-        self.list_size += 1
-
-        # Save new encrypted data to previous_hash_static
-        self.previous_hash_static = new_encrypted_data
-    """
-
     def add_block(self, new_unencrypted_data):
         # OBJECTIVE: Append a block at the end of the chain
 
