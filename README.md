@@ -5,4 +5,3 @@ The goal is to create a multi-use Blockchain for consumers to use. Instead of fo
 
 ## Notice
 This repository is developed for educational use only.
-
