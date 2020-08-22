@@ -13,3 +13,6 @@ class Block:
         self.previous_block_hash = None
         self.current_block_hash = None
         self.current_block_data = None
+
+        # Keep uploader's signature
+        self.uploader_signature = None
