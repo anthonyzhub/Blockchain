@@ -18,9 +18,6 @@ class LinkList:
         # Set head node as blank
         self.genesis_block = None
 
-        # Initialize Hash class
-        self.hash_class = Hash()
-
         # Set starting size to 0
         self.list_size = 0
 
@@ -138,12 +135,8 @@ class LinkList:
 
         # Get starting block
         current_block = self.genesis_block
-        position = 0
 
         while current_block is not None:
-
-            # Update position
-            position += 1
 
             # Print block's contents
             print("\nBlock Data:")
@@ -154,7 +147,7 @@ class LinkList:
             current_block = current_block.next_block_pointer
 
         # Print total number of blocks inside chain
-        print("\nTotal Blocks: {}".format(position))
+        print("\nTotal Blocks: {}".format(self.list_size))
 
     def download_blockchain_data(self):
 
@@ -166,22 +159,19 @@ class LinkList:
 
         # Get genesis block
         current_block = self.genesis_block
-        block_data = dict()
+        dict_block = dict()
         block_num = 0
 
         while current_block is not None:
 
             # Write block's data to dictionary
-            # block_data["Previous Block Pointer"] = current_block.prev_block_pointer <- Pointers point to memory address. It will be different in each computer
-            # block_data["Next Block Pointer"] = current_block.next_block_pointer
-            
-            block_data["Previous Block's Hash"] = current_block.previous_block_hash
-            block_data["Current Block's Hash"] = current_block.current_block_hash
+            dict_block["Previous Block's Hash"] = current_block.previous_block_hash
+            dict_block["Current Block's Hash"] = current_block.current_block_hash
 
-            block_data["Current Block's Data"] = current_block.current_block_data
+            dict_block["Current Block's Data"] = current_block.current_block_data
 
             # Save dictionary to data frame
-            self.data_frame = self.data_frame.append(block_data, ignore_index=True)
+            self.data_frame = self.data_frame.append(dict_block, ignore_index=True)
 
             # Rename index names to Block <block_num>
             """
