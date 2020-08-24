@@ -1,5 +1,5 @@
 from Block import Block
-from Hash import Hash
+# from Hash import Hash
 from Signature import Signature
 
 import numpy as np
@@ -46,7 +46,7 @@ class LinkList:
         # OBJECTIVE: Append a block at the end of the chain
 
         # Encrypt data
-        new_encrypted_data = self.sig.agenda(new_unencrypted_data)
+        new_encrypted_data, public_key = self.sig.agenda(new_unencrypted_data)
 
         # If list is empty, automatically add incoming_hash as head block
         if self.is_empty():
@@ -65,23 +65,29 @@ class LinkList:
             # Add plain data to block
             new_head_block.current_block_data = new_unencrypted_data # Add unencrypted data for verification later on
 
+            # Add user's public key
+            new_head_block.uploader_public_key = public_key
+
             # Set new_head_block as genesis_block
             self.genesis_block = new_head_block
 
         else:
 
-            # Create a new node and pass incoming_hash to it
+            # Create a new block
             new_block = Block()
+
+            # Add hash, unencrypted data, and public key to the new block
             new_block.current_block_hash = new_encrypted_data
             new_block.current_block_data = new_unencrypted_data
+            new_block.uploader_public_key = public_key
 
-            # Go to last block inside of chain
+            # Go to last block inside of the chain
             current_block = self.genesis_block
 
             while current_block.next_block_pointer is not None:
                 current_block = current_block.next_block_pointer
 
-            # Update current_block's pointer and hash value
+            # Update current_block's pointer
             current_block.next_block_pointer = new_block
 
             # Update new_block's pointers and hash values
@@ -140,8 +146,9 @@ class LinkList:
 
             # Print block's contents
             print("\nBlock Data:")
-            print("\tHash Value: {}".format(current_block.current_block_hash))
+            print("\tHash: {}".format(current_block.current_block_hash))
             print("\tData: {}".format(current_block.current_block_data))
+            print("\tUploader's public key: {}".format(current_block.uploader_public_key))
 
             # Move to next block
             current_block = current_block.next_block_pointer

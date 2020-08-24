@@ -12,8 +12,8 @@ class Signature:
 
     def __init__(self):
         
-        self.private_key = None
-        self.public_key = None
+        self.rsa_private_key = None
+        self.rsa_public_key = None
         self.signature = None
         self.user_name = os.environ['USER'] # <- Cannot find 'WHOAMI'
         self.PRIVATE_FILE_NAME = "{}-Private_Key.pem".format(self.user_name)
@@ -48,10 +48,10 @@ class Signature:
         """
 
         # Generate a pair of keys
-        self.private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
+        self.rsa_private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048, backend=default_backend())
 
         # From the private key derived the public key
-        self.public_key = self.private_key.public_key()
+        self.rsa_public_key = self.rsa_private_key.public_key()
 
         print("=== Generated Keys ===")
 
@@ -66,8 +66,8 @@ class Signature:
             # Open private key PEM file
             with open(self.PRIVATE_FILE_NAME, "rb") as private_file:
 
-                # Save private_file's content to private_key
-                self.private_key = serialization.load_pem_private_key(
+                # Save private_file's content to rsa_private_key
+                self.rsa_private_key = serialization.load_pem_private_key(
                     private_file.read(),
                     password=None, # <- Password wasn't given upon creation
                     backend=default_backend()
@@ -76,12 +76,12 @@ class Signature:
             # Open public key PEM file
             with open(self.PUBLIC_FILE_NAME, "rb") as public_file:
 
-                # Save public_file's content to public_key
-                self.public_key = serialization.load_pem_public_key(
+                # Save public_file's content to rsa_public_key
+                self.rsa_public_key = serialization.load_pem_public_key(
                     public_file.read(),
                     backend=default_backend()
                 )
-
+            print(self.rsa_public_key)
             print("=== Loaded Keys ===")
 
             return True
@@ -98,7 +98,7 @@ class Signature:
         # OBJECTIVE: To write the keys in a PEM file
 
         # Create a PEM file for the private key. The command below will serialize it.
-        private_pem_file = self.private_key.private_bytes(
+        private_pem_file = self.rsa_private_key.private_bytes(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=serialization.NoEncryption()
@@ -111,7 +111,7 @@ class Signature:
             private_file.write(private_pem_file)
 
         # Create a file for the public key. The command below will serialize it
-        public_pem_file = self.public_key.public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo)
+        public_pem_file = self.rsa_public_key.public_bytes(encoding=serialization.Encoding.PEM, format=serialization.PublicFormat.SubjectPublicKeyInfo)
         
         # Write the file in binary format
         with open(self.PUBLIC_FILE_NAME, "wb") as public_file:
@@ -135,7 +135,7 @@ class Signature:
         """
 
         # Digitally sign a block's data
-        self.signature = self.private_key.sign(
+        self.signature = self.rsa_private_key.sign(
             block_data,
             padding.PSS(
                 mgf=padding.MGF1(hashes.SHA256()),
@@ -149,7 +149,7 @@ class Signature:
         # Verify signature by decrypting signed data with signature
         try:
             
-            self.public_key.verify(
+            self.rsa_public_key.verify(
                 self.signature,
                 block_data,
                 padding.PSS(
@@ -182,7 +182,7 @@ class Signature:
         unencrypted_data = self.format_data(unencrypted_data)
 
         # Encrypt data with user's public key using SHA256
-        cipher = self.public_key.encrypt(
+        cipher = self.rsa_public_key.encrypt(
             unencrypted_data,
             padding.OAEP(
                 mgf=padding.MGF1(algorithm=hashes.SHA256()),
@@ -201,7 +201,7 @@ class Signature:
         # OBJECTIVE: To decrypt data from a block if user has correct private key
 
         # Decrypt cipher
-        plain = self.private_key.decrypt(
+        plain = self.rsa_private_key.decrypt(
             cipher,
             padding.OAEP(
                 mgf=padding.MGF1(algorithm=hashes.SHA256()),
@@ -232,5 +232,5 @@ class Signature:
         # Sign encrypted data and verify signature
         self.sign_block_data(cipher)
 
-        # Return encrypted data
-        return cipher
+        # Return encrypted data and user's public key
+        return cipher, self.rsa_public_key

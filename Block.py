@@ -15,4 +15,4 @@ class Block:
         self.current_block_data = None
 
         # Keep uploader's signature
-        self.uploader_signature = None
+        self.uploader_public_key = None
