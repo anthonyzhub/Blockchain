@@ -1,18 +1,34 @@
+import time
+import json
+
+from hashlib import sha256
+
 class Block:
 
     # OBJECTIVE: To create components needed to make a block
 
     # Class initializer
-    def __init__(self):
+    def __init__(self, index, data, timestamp, previous_block_hash, current_block_hash, nonce=0):
         
-        # Create pointers to surrounding blocks
-        self.prev_block_pointer = None
-        self.next_block_pointer = None
+        # Block's position and plain data
+        self.index = index
+        self.data = data
 
-        # Hold values of surrounding blocks' hash value
-        self.previous_block_hash = None
-        self.current_block_hash = None
-        self.current_block_data = None
+        # Block'stime of creation
+        self.timestamp = timestamp
 
-        # Keep uploader's signature
-        self.uploader_public_key = None
+        # Save hashes
+        self.previous_block_hash = previous_block_hash
+        self.current_block_hash = current_block_hash
+
+        self.nonce = nonce
+
+    def compute_hash(self):
+
+        # OBJECTIVE: Compute hash value of block's contents
+        
+        # Create a dictionary in JSON format and sort keys
+        json_string = json.dumps(self.__dict__, sort_keys=True)
+
+        # Return hash value of block's content
+        return sha256(json_string.encode()).hexdigest()
