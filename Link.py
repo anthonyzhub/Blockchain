@@ -11,7 +11,7 @@ class Blockchain:
 
     # Declare static variable for add_block()
     # A static variable's value will always be remembered until program is terminated
-    previous_hash_static = None
+    previous_hash_static = "0"
 
     # Difficulty of PoW algorithm
     difficulty = 2
@@ -74,7 +74,7 @@ class Blockchain:
         #   2. If hash is recomputed, would it return the same string?
         return (proposed_hash.startswith("0" * self.difficulty) and proposed_hash == new_block.compute_hash())
 
-    def validate_entry(self, new_block, proposed_hash):
+    def validate_entry(self, new_block):
 
         # OBJECTIVE: Verify block can be added to link list by:
         #
@@ -88,24 +88,26 @@ class Blockchain:
         if new_block.previous_block_hash != old_hash:
             return False
 
+        """
+        NOTE: IBM article is confusing. 
+            create_hash() will create an infinite amount of potential hash values before assigning it to the block. Why? Because the hash needs to start with N number
+            of 0s due to level of difficulty. compute_hash() only computes the hash value once. So, how is it fair to get matching hash values between a single-use
+            function and a multi-use function? This is why I commented the if-statement.
+        """
         # Stop if block's hash value isn't valid
-        if not self.is_hash_valid(new_block, proposed_hash):
-            return False
+        # if not self.is_hash_valid(new_block, proposed_hash):
+            # return False
 
         # If hash value is valid, then add it to the new block
-        new_block.current_block_hash = proposed_hash
+        # new_block.current_block_hash = proposed_hash
 
         return True
 
-    def create_head(self, data):
+    def create_head(self, head_block):
 
         # OBJECTIVE: Create a head block with previous_hash as 0
 
         print("Creating a head block")
-
-        # Create a head block with a hash
-        head_block = Block(self.list_size, data, time.time(), "0")
-        head_block.current_block_hash = self.create_hash(head_block)
 
         # Add it to link list
         self.head = head_block
@@ -117,20 +119,16 @@ class Blockchain:
         # Increment counter for list size
         self.list_size += 1
 
-    def add_block(self, data):
+    def add_block(self, new_block):
 
         # OBJECTIVE: Add a block to link list
 
         # If list is empty, go to a dedicated function to create a head block
         if self.is_empty():
 
-            self.create_head(data)
+            self.create_head(new_block)
 
         print("Creating a new block")
-
-        # Create a new block and compute a hash value
-        new_block = Block(self.list_size, data, time.time(), self.previous_hash_static)
-        new_block.current_block_hash = self.create_hash(new_block)
 
         # Get last block to update pointers
         old_block = self.tail
@@ -148,6 +146,47 @@ class Blockchain:
 
         # Update list's length
         self.list_size += 1
+
+    def submit_new_transaction(self, data):
+
+        # OBJECTIVE: Add data to a list of unconfirmed transactions
+        self.unconfirmed_transactions.append(data)
+
+    def request_to_mine(self):
+
+        # OBJECTIVE: Check if transactions needs to be confirmed. If so, then starting mining
+
+        # Check if unconfirmed_transactions is empty
+        if not self.unconfirmed_transactions:
+            return False
+
+        # Pop data from list
+        data = self.unconfirmed_transactions.popleft()
+
+        # Create a new block and compute a hash value
+        new_block = Block(self.list_size, data, time.time(), self.previous_hash_static)
+        new_block.current_block_hash = self.create_hash(new_block)
+
+        # If link list is empty, there's nothing to verify, so add new_block
+        if not self.list_size:
+            self.add_block(new_block)
+
+        # Validate new block
+        elif self.validate_entry(new_block):
+
+            # Add block to link list
+            self.add_block(new_block)
+
+        else:
+            
+            # Print error message and add data back to queue
+            print("ERROR: Unable to add block!")
+            self.unconfirmed_transactions.append(data)
+
+            return False
+
+        return True
+
 
     def verify_chain(self):
 
