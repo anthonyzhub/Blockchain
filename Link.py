@@ -36,7 +36,7 @@ class Blockchain:
         # OBJECTIVE: Check if list is empty
         return self.list_size == 0
 
-    def create_hash(self, block):
+    def proof_of_work(self, block):
 
         # OBJECTIVE: Before officially adding a block, increment block's nonce value until a proper hash value is computed
 
@@ -127,6 +127,7 @@ class Blockchain:
         if self.is_empty():
 
             self.create_head(new_block)
+            return None
 
         print("Creating a new block")
 
@@ -165,7 +166,7 @@ class Blockchain:
 
         # Create a new block and compute a hash value
         new_block = Block(self.list_size, data, time.time(), self.previous_hash_static)
-        new_block.current_block_hash = self.create_hash(new_block)
+        new_block.current_block_hash = self.proof_of_work(new_block)
 
         # If link list is empty, there's nothing to verify, so add new_block
         if not self.list_size:
@@ -187,8 +188,9 @@ class Blockchain:
 
         return True
 
-
     def verify_chain(self):
+
+        # OBJECTIVE: Verify blockchain has not been tampered with
 
         # Exit if link list only has <=1 block
         if self.is_empty() or self.list_size == 1:
@@ -218,7 +220,6 @@ class Blockchain:
 
         return True
 
-
     def print_list(self):
 
         # OBJECTIVE: Print blockchain
@@ -231,21 +232,17 @@ class Blockchain:
 
         # Get head block
         old_block = self.head
-        counter = 0
 
+        # Iterate link list
         while old_block is not None:
 
-            # Print block's contents
-            print("\nBlock Data:")
-            print("\tHash: {}".format(old_block.current_block_hash))
-            print("\tData: {}".format(old_block.data))
-            counter += 1
+            print("Block:")
+            print("\tIndex => {}".format(old_block.__dict__["index"]))
+            print("\tData => {}".format(old_block.__dict__["data"]))
+            print("\tHash => {}\n".format(old_block.__dict__["current_block_hash"]))
 
             # Move to next block
             old_block = old_block.next_block
-
-        # Print total number of blocks inside chain
-        print("\nTotal Blocks: {}".format(counter))
 
     def download_blockchain_data(self):
 
